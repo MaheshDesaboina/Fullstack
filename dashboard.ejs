@@ -1,154 +1,117 @@
-body, h1, h3, p, ul, li, form, table {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Nutrition Awareness</title>
+    <link rel="stylesheet" href="/styles/dashboard.css">
+</head>
+<body>
+    <header>
+        <h1 class="title">NutriAware: Your Nutrition Tracker</h1>
+        <nav>
+            <ul>
+                <li class="right"><a href="/">Home</a></li>
+                <li class="right"><a href="/login.html">Login</a></li>
+                <li class="right"><a href="/signup.html">Sign Up</a></li>
+                <li><a href="/dashboard">Dashboard</a></li>
+            </ul>
+        </nav>
+    </header>
 
-body {
-    font-family: Arial, sans-serif;
-    background-color: #f8f9fa;
-    color: #333;
-}
+    <div class="dashboard-container">
+        <marquee>Welcome to the NUTRITION TRACKER, <%= username %>!</marquee>
+        <p>Login successful!
+        <img src="/images/login_success.jpg" alt="Login Icon">
+        </p>
+        <form id="foodSearchForm">
+            <label for="food">Enter Food Item:</label>
+            <input type="text" id="food" name="food" required>
+            <button type="submit">Search</button>
+        </form>
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Nutrient</th>
+                        <th>Calories</th>
+                        <th>Protein (g)</th>
+                        <th>Carbs (g)</th>
+                        <th>Fat (g)</th>
+                    </tr>
+                </thead>
+                <tbody id="nutritionData">
+                    <% if (nutrients.length > 0) { %>
+                        <% nutrients.forEach(function(nutrient) { %>
+                            <tr>
+                                <td><%= nutrient.name %></td>
+                                <td><%= nutrient.calories %></td>
+                                <td><%= nutrient.protein %></td>
+                                <td><%= nutrient.carbs %></td>
+                                <td><%= nutrient.fat %></td>
+                            </tr>
+                        <% }); %>
+                    <% } %>
+                </tbody>
+            </table>
+            <div class="nutrition-animation">
+                <img src="/images/nutrition.png" alt="Nutrition Animation">
+            </div>
+        </div>
+        <h3 class="<%= isFoodHealthy ? 'safe' : 'danger' %>">
+            <%= isFoodHealthy ? 'Healthy' : 'Unhealthy' %> 
+            <img src="/images/<%= isFoodHealthy ? 'safe' : 'danger' %>.png" alt="<%= isFoodHealthy ? 'Healthy' : 'Unhealthy' %> Icon">
+        </h3>
+    </div>
+    <footer>
+        <marquee><p>“Good nutrition is the foundation of a healthy life.”</p></marquee>
+        <p>&copy; 2024 Nutrition Awareness</p>
+    </footer>
 
-header {
-    background-color: #28a745;
-    color: white;
-    padding: 1em 0;
-    text-align: center;
-}
+    <script>
+        document.getElementById('foodSearchForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const food = document.getElementById('food').value;
+            fetchNutritionData(food);
+        });
 
-header h1.title {
-    font-size: 2.5em;
-    margin-bottom: 0.5em;
-}
+        function fetchNutritionData(food) {
+            fetch('/getNutrition?food=' + food)
+                .then(response => response.json())
+                .then(data => {
+                    const nutrients = data.nutrients;
+                    const isFoodHealthy = data.isFoodHealthy;
+                    const nutritionTable = document.getElementById('nutritionData');
+                    nutritionTable.innerHTML = '';
+                    nutrients.forEach(nutrient => {
+                        const row = document.createElement('tr');
+                        const nutrientNameCell = document.createElement('td');
+                        nutrientNameCell.textContent = nutrient.name;
+                        const nutrientCaloriesCell = document.createElement('td');
+                        nutrientCaloriesCell.textContent = nutrient.calories;
+                        const nutrientProteinCell = document.createElement('td');
+                        nutrientProteinCell.textContent = nutrient.protein;
+                        const nutrientCarbsCell = document.createElement('td');
+                        nutrientCarbsCell.textContent = nutrient.carbs;
+                        const nutrientFatCell = document.createElement('td');
+                        nutrientFatCell.textContent = nutrient.fat;
+                        row.appendChild(nutrientNameCell);
+                        row.appendChild(nutrientCaloriesCell);
+                        row.appendChild(nutrientProteinCell);
+                        row.appendChild(nutrientCarbsCell);
+                        row.appendChild(nutrientFatCell);
+                        nutritionTable.appendChild(row);
+                    });
 
-nav ul {
-    list-style-type: none;
-    display: flex;
-    justify-content: center;
-    gap: 20px;
-}
-
-nav a {
-    color: white;
-    text-decoration: none;
-    font-size: 1.1em;
-}
-
-nav a:hover {
-    text-decoration: underline;
-}
-
-.dashboard-container {
-    max-width: 800px;
-    margin: 2em auto;
-    padding: 1em;
-    background: white;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-    border-radius: 10px;
-    text-align: center;
-}
-
-.dashboard-container marquee {
-    margin-bottom: 1em;
-    font-size: 1.2em;
-    color: #28a745;
-}
-
-.dashboard-container p {
-    margin-bottom: 1em;
-    font-size: 1.1em;
-}
-
-.dashboard-container img {
-    width: 50px;
-    vertical-align: middle;
-}
-
-form {
-    margin: 1.5em 0;
-}
-
-form label {
-    font-size: 1.1em;
-    margin-right: 0.5em;
-}
-
-form input {
-    padding: 0.5em;
-    font-size: 1em;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-}
-
-form button {
-    padding: 0.5em 1em;
-    font-size: 1em;
-    background-color: #28a745;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-}
-
-form button:hover {
-    background-color: #218838;
-}
-
-.table-container {
-    margin: 2em 0;
-}
-
-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-bottom: 1em;
-}
-
-table th, table td {
-    padding: 1em;
-    border: 1px solid #ddd;
-}
-
-table th {
-    background-color: #f1f1f1;
-}
-
-table tr:nth-child(even) {
-    background-color: #f9f9f9;
-}
-
-table tr:hover {
-    background-color: #f1f1f1;
-}
-
-.nutrition-animation img {
-    width: 100px;
-    margin-top: 1em;
-}
-
-h3.safe {
-    color: #28a745;
-}
-
-h3.danger {
-    color: #dc3545;
-}
-
-footer {
-    background-color: #f1f1f1;
-    padding: 1em 0;
-    text-align: center;
-    margin-top: 2em;
-    border-top: 1px solid #ddd;
-}
-
-footer marquee {
-    font-size: 1.1em;
-    margin-bottom: 0.5em;
-}
-
-footer p {
-    font-size: 0.9em;
-    color: #666;
-}
+                    const healthStatusElement = document.querySelector('h3');
+                    healthStatusElement.textContent = isFoodHealthy ? 'Healthy' : 'Unhealthy';
+                    healthStatusElement.className = isFoodHealthy ? 'safe' : 'danger';
+                    healthStatusElement.innerHTML += `<img src="/images/${isFoodHealthy ? 'safe' : 'danger'}.png" alt="${isFoodHealthy ? 'Healthy' : 'Unhealthy'} Icon">`;
+                })
+                .catch(error => {
+                    console.error('Error fetching nutrition data:', error);
+                });
+        }
+    </script>
+</body>
+</html>
